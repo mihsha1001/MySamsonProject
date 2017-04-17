@@ -1,0 +1,25 @@
+<% @role.resource_name ||= @project.permalink.tr('_', '-') + '-' %>
+<%= form_for [@project, @role], html: { class: "form-horizontal" } do |form| %>
+  <%= render 'shared/errors', object: @role %>
+
+  <fieldset>
+    <%= form.input :name %>
+    <%= form.input :config_file %>
+    <%= form.input :service_name %>
+    <%= form.input :resource_name,
+          pattern: Kubernetes::RoleVerifier::VALID_LABEL,
+          help: "Name for the resource this role will create (service/job), a-Z 0-9 and -"
+    %>
+
+    <div class="form-group">
+      <div class="col-lg-offset-2 col-lg-10">
+        <% if current_user.admin_for?(@project) %>
+          <%= form.submit @role.persisted? ? 'Save' : 'Create', class: "btn btn-primary" %>
+          <%= link_to_delete [@project, @role], class: 'btn btn-default' if @role.persisted? %>
+        <% end %>
+        <%= link_to "Cancel", :back, class: 'btn btn-default' %>
+        <%= link_to_history @role %>
+      </div>
+    </div>
+  </fieldset>
+<% end %>

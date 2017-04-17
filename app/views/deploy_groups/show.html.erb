@@ -1,0 +1,7 @@
+<%= breadcrumb @deploy_group.environment, @deploy_group %>
+
+<%= page_title @deploy_group.name %>
+
+<deploy-group-timeline ng-controller="DeployGroupsCtrl" ></deploy-group-timeline>
+
+<%= render 'shared/deploys_table' %>

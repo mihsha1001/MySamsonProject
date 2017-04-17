@@ -1,0 +1,62 @@
+<%= form_for [:admin, @deploy_group_role], html: { class: "form-horizontal" } do |form| %>
+  <%= redirect_to_field %>
+  <%= render 'shared/errors', object: @deploy_group_role %>
+  <% defaults = @deploy_group_role.kubernetes_role.try(:defaults) || {} %>
+
+  <fieldset>
+    <%= form.input :deploy_group_id do %>
+      <%= form.select :deploy_group_id, DeployGroup.pluck(:name, :id), {}, class: "form-control", disabled: @deploy_group_role.persisted? %>
+    <% end %>
+
+    <%= form.input :project_id do %>
+      <% projects = current_user.administrated_projects.with_kubernetes_roles.pluck(:name, :id) %>
+      <%= form.select :project_id, projects, {}, class: "form-control", disabled: @deploy_group_role.persisted? %>
+    <% end %>
+
+    <%= form.input :kubernetes_role_id, label: 'Role' do %>
+      <%= form.select :kubernetes_role_id, [['Loading ...', @deploy_group_role.kubernetes_role_id]], {}, class: "form-control", disabled: @deploy_group_role.persisted? %>
+    <% end %>
+
+    <% [[:replicas, "Replicas"], [:cpu, 'CPU Cores'], [:ram, 'Ram in MB']].each do |column, label| %>
+      <%= form.input column, label: label do %>
+        <%= form.text_field column, class: "form-control" %>
+        <% if default = defaults[column] %>
+          Default: <%= default %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <div class="form-group">
+      <div class="col-lg-offset-2 col-lg-10">
+        <%= form.submit @deploy_group_role.persisted? ? 'Save' : 'Create', class: "btn btn-primary" %>
+        <%= link_to_delete [:admin, @deploy_group_role], class: 'btn btn-default' if @deploy_group_role.persisted? %>
+        <%= link_to "Cancel", :back, class: 'btn btn-default' %>
+        <%= link_to_history @deploy_group_role %>
+      </div>
+    </div>
+  </fieldset>
+<% end %>
+
+<script>
+  // change selectable roles when project changes, since every project has different roles
+  $(function(){
+    var project_data = <%= Kubernetes::Role.not_deleted.pluck(:project_id, :id, :name).group_by(&:first).to_json.html_safe %>
+    $('#kubernetes_deploy_group_role_project_id').change(function () {
+      var $role_select = $('#kubernetes_deploy_group_role_kubernetes_role_id');
+      var project_id = parseInt($(this).val(), 10);
+      var val = parseInt($role_select.val(), 10);
+      var roles = project_data[project_id];
+
+      // clear out previous options and refresh the select
+      $role_select.html('').val('');
+
+      // fill in currently selectable roles, keeping the current selection for edit or failed create
+      $.each(roles, function(i, e){
+        $role_select.append($("<option>", { value: e[1], html: e[2], selected: (e[1] === val) }));
+      });
+
+      // highlight the changed select so user sees the effect
+      $role_select.effect("highlight", {color: "#ffffe0"}, 500);
+    }).trigger('change');
+  });
+</script>

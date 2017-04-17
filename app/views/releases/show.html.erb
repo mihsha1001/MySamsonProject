@@ -1,0 +1,41 @@
+<%= breadcrumb @project, link_to("Releases", project_releases_path(@project)), "Release #{@release.version}" %>
+
+<%= page_title do %>
+  Release <%= @release.version %>: <code><%= @release.commit %></code>
+<% end %>
+
+<section class="clearfix tabs release">
+  <div class="pull-right">
+    <%= render 'deploy_to_button', release: @release, stages: @project.stages %>
+  </div>
+
+  <%= render 'deployed_to', release: @release %>
+
+  <label>Created</label>
+  <%= relative_time(@release.created_at) %>
+
+  <% if @changeset.empty? %>
+    <p>This release contains no changes.</p>
+  <% else %>
+    <% if @changeset.pull_requests.any? %>
+      <legend>Pull requests</legend>
+      <%= render 'changeset/pulls', changeset: @changeset %>
+    <% end %>
+
+    <legend>Commits</legend>
+    <%= render 'changeset/commits', changeset: @changeset %>
+
+    <legend>Files</legend>
+    <%= render 'changeset/files', changeset: @changeset %>
+
+    <% if @changeset.risks? %>
+      <legend>Risks</legend>
+      <%= render 'changeset/risks', pull_requests: @changeset.risky_pull_requests, type: "release" %>
+    <% end %>
+
+    <% if @changeset.jira_issues.any? %>
+      <legend>Jira issues</legend>
+      <%= render 'changeset/jira_issues', jira_issues: @changeset.jira_issues, type: "release" %>
+    <% end %>
+  <% end %>
+</section>

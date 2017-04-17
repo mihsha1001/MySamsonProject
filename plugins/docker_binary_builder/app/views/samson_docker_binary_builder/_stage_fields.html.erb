@@ -1,0 +1,5 @@
+<fieldset>
+  <legend>Docker Binary Builder</legend>
+  <% label = "Use Docker to build/compile artifacts (".html_safe << link_to("docs", "https://github.com/zendesk/samson/tree/master/plugins/docker_binary_builder") << ")" %>
+  <%= form.input :docker_binary_plugin_enabled, as: :check_box, label: label %>
+</fieldset>

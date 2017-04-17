@@ -1,0 +1,42 @@
+<% title = (@group.new_record? ? "New group" : "Edit #{@group.name}") %>
+
+<% crumbs = [["Environment variables", [:admin, EnvironmentVariableGroup]]] %>
+<% if @group.new_record? %>
+  <%= manual_breadcrumb(crumbs + [[title, nil]]) %>
+<% else %>
+  <%= manual_breadcrumb(crumbs + [[@group.name, [:admin, @group]], ["Edit", nil]]) %>
+<% end %>
+
+<%= page_title title %>
+
+<section>
+  <%= form_for [:admin, @group], html: { class: "form-horizontal" } do |form| %>
+    <fieldset>
+      <%= form.input :name %>
+      <%= form.input :comment, as: :text_area, input_html: {size: "80x4"} %>
+    </fieldset>
+
+    <% if @group.projects.length > 0 %>
+      <fieldset>
+        <legend>Usages</legend>
+        <%= render 'projects', group: @group %>
+      </fieldset>
+    <% end %>
+
+    <fieldset>
+      <legend>
+        Environment variables
+        <%= additional_info SamsonEnv::HELP_TEXT %>
+      </legend>
+      <%= render "samson_env/environment_variables", form: form %> |
+      <%= link_to "Preview", preview_admin_environment_variable_groups_path(group_id: @group.id) %>
+
+      <% if current_user.admin? %>
+        <hr>
+
+        <%= form.actions delete: (@group.projects.length > 0 ? false : [:admin, @group]) %>
+      <% end %>
+    </fieldset>
+  <% end %>
+</section>
+

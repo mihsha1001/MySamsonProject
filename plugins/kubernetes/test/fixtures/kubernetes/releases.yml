@@ -1,0 +1,7 @@
+test_release:
+  user: deployer
+  build: docker_build
+  project: test
+  git_sha: abababababa
+  git_ref: master
+  deploy: succeeded_test

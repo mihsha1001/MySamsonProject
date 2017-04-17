@@ -1,0 +1,73 @@
+{
+  "name": "Samson",
+  "repository": "https://github.com/zendesk/samson",
+  "logo": "https://raw.githubusercontent.com/zendesk/samson/master/app/assets/images/logo_light.png",
+  "addons": [
+    "heroku-postgresql:hobby-dev",
+    "memcachier:dev"
+  ],
+  "env": {
+    "PLUGINS": {
+      "description": "What plugins to use",
+      "value": "all",
+      "required": true
+    },
+    "DEFAULT_URL": {
+      "description": "https://xyz.herokuapp.com",
+      "required": true
+    },
+    "SECRET_TOKEN": {
+      "description": "Token used to generate session secret",
+      "generator": "secret",
+      "required": true
+    },
+    "GITHUB_TOKEN": {
+      "description": "Token to fetch commit diff / PR status / create tags",
+      "required": true
+    },
+    "AUTH_GITHUB": {
+      "description": "Set to 1 to use github auth",
+      "required": false
+    },
+    "GITHUB_CLIENT_ID": {
+      "description": "Fill in to use github auth",
+      "required": false
+    },
+    "GITHUB_SECRET": {
+      "description": "Fill in to use github auth",
+      "required": false
+    },
+    "AUTH_GOOGLE": {
+      "description": "Set to 1 to use google auth",
+      "required": false
+    },
+    "GOOGLE_CLIENT_ID": {
+      "description": "Fill in to use google auth",
+      "required": false
+    },
+    "GOOGLE_CLIENT_SECRET": {
+      "description": "Fill in to use google auth",
+      "required": false
+    },
+    "BUNDLE_WITHOUT": {
+      "description": "Groups to ignore when bundling",
+      "value": "mysql2:sqlite"
+    },
+    "DEPLOY_TASKS": {
+      "description": "Rake tasks to run after deploying",
+      "value": "db:migrate"
+    },
+    "RAILS_LOG_TO_STDOUT": {
+      "description": "Log to stdout so heroku can display logs",
+      "value": "true"
+    }
+  },
+  "scripts": {
+    "postdeploy": "DISABLE_DATABASE_ENVIRONMENT_CHECK=1 bundle exec rake db:schema:load"
+  },
+  "keywords": ["samson", "deploy", "github", "rails"],
+  "buildpacks": [
+    {"url": "https://github.com/heroku/heroku-buildpack-ruby.git"},
+    {"url": "https://github.com/gunpowderlabs/buildpack-ruby-rake-deploy-tasks.git"}
+  ]
+}

@@ -1,0 +1,39 @@
+@import 'constants';
+
+.timeline {
+  a:hover {
+    text-decoration: none;
+  }
+
+  label, th {
+    font-weight: normal;
+  }
+
+  tr:hover:not(:first-child) {
+    background-color: $samsonLight;
+  }
+
+  td, th {
+    padding: 5px 15px;
+  }
+
+  td {
+    border-bottom: 1px solid $samsonLight;
+  }
+
+  th {
+    padding: 0 15px 10px;
+    border-bottom: 1px solid $samsonGrey;
+  }
+
+  .timeline-content {
+    color: $samsonDark;
+    width: 100%;
+  }
+
+  .dropdown-toggle:focus,
+  .bootstrap-select .btn:focus,
+  .bootstrap-select a:focus {
+    outline: none !important;
+  }
+}

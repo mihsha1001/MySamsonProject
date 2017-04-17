@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <% title = content_for(:page_title) %>
+    <title><%= title ? strip_tags(title) + (@project ? " - #{@project.name}" : "") : "Samson" %></title>
+    <%= csrf_meta_tags %>
+    <%= favicon_link_tag '32x32_light.png', type: 'image/png'%>
+    <%= stylesheet_link_tag "application", media: "all" %>
+    <%= Samson::Hooks.render_stylesheets(self) %>
+    <%= javascript_include_tag "application" %>
+    <%= Samson::Hooks.render_javascripts(self) %>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="stream-origin" content="<%= Rails.application.config.samson.stream_origin %>">
+    <meta name="deploy-origin" content="<%= Rails.application.config.samson.deploy_origin %>">
+    <meta name="environment" content="<%= Rails.env %>">
+  </head>
+
+  <body class="<%= controller_action %>" ng-app="samson">
+    <div class="wrap">
+      <%= render "shared/header" %>
+      <div class="container">
+        <%= render "shared/alerts" %>
+
+        <% unless github_ok? %>
+          <div class="alert alert-warning alert-dismissable">
+            <%= image_tag image_url('github.png'), style: 'height: 20px; background: #8a6d3b' %>
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            GitHub may be having problems. Please monitor their <a href="<%= Rails.application.config.samson.github.status_url %>">status page</a> for more details.
+          </div>
+        <% end %>
+
+        <%= yield %>
+      </div>
+    </div>
+    <%= render "shared/footer" %>
+  </body>
+</html>

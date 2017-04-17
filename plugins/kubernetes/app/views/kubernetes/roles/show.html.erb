@@ -1,0 +1,10 @@
+<%= render 'projects/header', project: @project, tab: 'kubernetes' %>
+
+<section class="tabs kubernetes-section clearfix">
+  <%= render 'samson_kubernetes/navigation' %>
+
+  <section>
+    <%= page_title "Kubernetes Role #{@role.name}", in_tab: true %>
+    <%= render 'form' %>
+  </section>
+</section>

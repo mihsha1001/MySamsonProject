@@ -1,0 +1,60 @@
+<fieldset>
+  <%= form.input :name, required: true %>
+  <%= form.input :permalink, required: true if form.object.persisted? %>
+  <%= form.input :notify_email_address,
+        label: "Notify after deploy",
+        help: "Email addresses to notify of finished deploys, separated by <code>;</code>".html_safe
+  %>
+
+  <% if DeployGroup.enabled? %>
+    <%= render 'deploy_groups/deploy_group_select', form: form %>
+  <% else %>
+    <%= form.input :production, as: :check_box,
+          label: 'Impacts production',
+          help: "Deploys to production need to pass a buddy check when BuddyCheck is enabled."
+    %>
+  <% end %>
+
+  <% help = "Bypass " + [("buddy check" if BuddyCheck.enabled?), "release tracking"].compact.to_sentence %>
+  <%= form.input :no_code_deployed, as: :check_box, label: "Does not deploy code", help: help %>
+
+  <%= form.input :run_in_parallel, as: :check_box, label: "Can run in parallel", help: "Deploys are not queued. Executed immediately" %>
+
+  <%= form.input :cancel_queued_deploys, as: :check_box, label: "Max 1 queued deploy per user", help: "When a new deploy is created for a user. Any queued deploys for that user are cancelled. This most useful when trying to not deploy every push for frequently updated projects." %>
+
+  <%= form.input :confirm, as: :check_box, label: "Confirm before deployment", help: "Show a review page before starting a deploy" %>
+
+  <% if @project.releases.any? %>
+    <%= form.input :deploy_on_release, as: :check_box, label: "Automatically deploy new releases" %>
+  <% end %>
+
+  <% if DeployGroup.enabled? %>
+    <%= form.input :is_template, as: :check_box,
+          label: "Template Stage",
+          help: "This stage can serve as a template to create new stages for its environment (only changing the deploy group)."
+    %>
+  <% end %>
+</fieldset>
+
+<%= render 'shared/commands', form: form %>
+<%= render 'shared/dashboard_field', form: form %>
+
+<fieldset>
+  <legend>Email on automated deploy failure</legend>
+  <div class="col-lg-offset-2">
+    <p>When an automated deploy initially fails, send a email to:</p>
+  </div>
+
+  <%= form.input :email_committers_on_automated_deploy_failure, as: :check_box, label: "Committers in the diff to last successful deploy" %>
+
+  <div class="col-lg-offset-2">
+    <div class="form-group">
+      <div class="col-lg-6">
+        <p>Addresses (comma separated):</p>
+        <%= form.text_field :static_emails_on_automated_deploy_failure, class: "form-control" %>
+      </div>
+    </div>
+  </div>
+</fieldset>
+
+<%= Samson::Hooks.render_views(:stage_form, self, form: form) %>

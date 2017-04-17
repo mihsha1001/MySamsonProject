@@ -1,0 +1,75 @@
+<% page_title "Deploy" %>
+
+<%= breadcrumb @project, @stage, "Deploy" %>
+
+<%= render_lock @stage %>
+
+<section>
+  <% data = {
+      'commit-status-url' => project_stage_commit_statuses_path(@project, @stage),
+      'confirm-url' => confirm_project_stage_deploys_path(@project, @stage),
+      'confirmation' => @stage.confirm?
+    }
+  %>
+  <%= form_for [@project, @stage, @deploy], html: { class: "form-horizontal" }, data: data do |form| %>
+    <fieldset>
+      <%= render 'shared/errors', object: @deploy %>
+
+      <div class="form-group">
+        <%= form.label :reference, "Reference", class: "col-lg-2 control-label" %>
+        <div id="scrollable-dropdown-menu" class="col-lg-4">
+          <%= form.text_field :reference,
+              class: "form-control",
+              autofocus: true,
+              placeholder: "e.g. v2.1.43, master, fa0b4671",
+              data: { prefetch_url: project_references_path(@project, format: "json") }
+          %>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div id="ref-problem-warning" class="col-lg-5 col-lg-offset-2 alert alert-warning hidden">
+          <p>Problems detected, are you sure you wish to deploy?</p>
+          <ul id="ref-problem-list"></ul>
+        </div>
+      </div>
+
+      <%= Samson::Hooks.render_views(:deploy_form, self, project: @project, form: form) %>
+
+      <% if recent_releases = @project.releases.last(5).presence %>
+        <div class="form-group" id="recent-releases">
+          <label class="col-lg-2 control-label">Recent releases</label>
+          <div class="col-lg-4">
+            <% recent_releases.each do |release| %>
+              <%= release_label(@project, release) %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="form-group" id="new-deploy-buttons">
+        <div class="col-lg-offset-2 col-lg-10">
+          <%= form.submit "", class: "btn btn-primary", disabled: Lock.locked_for?(@stage, current_user), data: {disable_with: false} %>
+          <%= link_to "Cancel", :back, class: 'btn btn-default' %>
+        </div>
+      </div>
+
+      <div id="deploy-confirmation">
+        <ul class="nav nav-tabs">
+          <li><a href="#files" data-toggle="tab">Files</a></li>
+          <li><a href="#commits" data-toggle="tab">Commits</a></li>
+          <li><a href="#pulls" data-toggle="tab">Pull Requests</a></li>
+          <li><a href="#risks" data-toggle="tab">Risks</a></li>
+        </ul>
+
+        <div class="tab-content deploy-details">
+          <% %w(files commits pulls risks).each_with_index do |pane, i| %>
+            <div class="tab-pane changeset-placeholder" id="<%= pane %>">
+              <p>Loading...</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </fieldset>
+  <% end %>
+</section>

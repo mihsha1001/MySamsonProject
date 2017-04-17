@@ -1,0 +1,9 @@
+production:
+  name: Production
+  production: true
+  permalink: production
+
+staging:
+  name: Staging
+  production: false
+  permalink: staging

@@ -1,0 +1,4 @@
+test:
+  name: Test Macro
+  project: test
+  reference: master

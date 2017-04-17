@@ -1,0 +1,9 @@
+<%= form_for [project, macro], html: { class: "form-horizontal" } do |form| %>
+  <fieldset>
+    <%= render 'macros/fields', form: form %>
+  </fieldset>
+
+  <hr>
+
+  <%= form.actions %>
+<% end %>

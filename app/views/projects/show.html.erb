@@ -1,0 +1,37 @@
+<% page_title project.name %>
+
+<%= render 'projects/header', project: project, tab: "stages" %>
+
+<section class="clearfix tabs">
+  <%= render 'shared/dashboard', resource: @project %>
+
+  <table class="project-stages table table-condensed">
+    <thead>
+      <tr>
+        <th>Stage Name</th>
+        <% if DeployGroup.enabled? %>
+          <th>Deploy Groups</th>
+        <% end %>
+        <th>Last Deploy</th>
+        <th class="pull-right">
+          <% if current_user.admin_for?(@project) %>
+            <%= link_to 'Manage', project_stages_path(@project) %>
+          <% end %>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if @stages.any? %>
+        <% cache [project, 'stages', Lock.cache_key] do %>
+          <%= render partial: "stage", collection: @stages %>
+        <% end %>
+      <% else %>
+        <tr>
+          <td rowspan="4">
+            No stages found, use the <b>Manage</b> link up top to add the first stage!
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</section>
